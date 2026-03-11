@@ -72,8 +72,12 @@ class TestDatabaseOperations:
         assert result[0] == "citydb"
     
     def test_tables_exist(self, db_connection):
-        """Test required tables exist"""
-        required_tables = ["cityobject", "building", "surface_geometry"]
+        """Test required 3DCityDB v5.x tables exist"""
+        required_tables = [
+            "feature", "objectclass", "namespace", 
+            "datatype", "property", "geometry_data", 
+            "surface_geometry", "_materials_for_features"
+        ]
         
         for table in required_tables:
             db_connection.execute("""
@@ -85,15 +89,15 @@ class TestDatabaseOperations:
     
     def test_test_data_exists(self, db_connection):
         """Test test data was inserted"""
-        db_connection.execute("SELECT COUNT(*) FROM citydb.cityobject")
+        db_connection.execute("SELECT COUNT(*) FROM citydb.feature")
         count = db_connection.fetchone()[0]
-        assert count >= 3, "Expected at least 3 test cityobjects"
+        assert count >= 4, "Expected at least 4 test features"
     
-    def test_building_count(self, db_connection):
-        """Test building count"""
-        db_connection.execute("SELECT COUNT(*) FROM citydb.building")
+    def test_objectclass_count(self, db_connection):
+        """Test objectclass count"""
+        db_connection.execute("SELECT COUNT(*) FROM citydb.objectclass")
         count = db_connection.fetchone()[0]
-        assert count >= 3, "Expected at least 3 test buildings"
+        assert count >= 4, "Expected at least 4 objectclasses"
 
 
 @pytest.mark.integration

@@ -75,64 +75,77 @@ class TestDatabaseConnectionFunctions:
 
 
 @pytest.mark.integration
-class TestCityObjectQueries:
-    """Test queries against cityobject table"""
+class TestFeatureQueries:
+    """Test queries against feature table (3DCityDB v5.x)"""
     
-    def test_count_cityobjects(self, db_connection):
-        """Test counting cityobjects"""
-        db_connection.execute("SELECT COUNT(*) FROM citydb.cityobject")
+    def test_count_features(self, db_connection):
+        """Test counting features"""
+        db_connection.execute("SELECT COUNT(*) FROM citydb.feature")
         count = db_connection.fetchone()[0]
-        assert count >= 3  # At least test data
+        assert count >= 4  # At least test data
     
     def test_query_by_class(self, db_connection):
         """Test querying by object class"""
         db_connection.execute("""
-            SELECT COUNT(*) FROM citydb.cityobject 
+            SELECT COUNT(*) FROM citydb.feature 
             WHERE class = 'Building'
         """)
         count = db_connection.fetchone()[0]
-        assert count >= 0
+        assert count >= 3
     
     def test_query_by_gmlid(self, db_connection):
         """Test querying by GML ID"""
         db_connection.execute("""
-            SELECT id, gmlid, class FROM citydb.cityobject 
+            SELECT id, gmlid, class FROM citydb.feature 
             WHERE gmlid LIKE 'TEST_%'
+        """)
+        results = db_connection.fetchall()
+        assert len(results) >= 4
+    
+    def test_query_by_objectclass(self, db_connection):
+        """Test querying by objectclass"""
+        db_connection.execute("""
+            SELECT f.id, f.gmlid, oc.classname 
+            FROM citydb.feature f
+            JOIN citydb.objectclass oc ON f.objectclass_id = oc.id
+            WHERE oc.classname = 'Building'
         """)
         results = db_connection.fetchall()
         assert len(results) >= 3
 
 
 @pytest.mark.integration
-class TestBuildingQueries:
-    """Test queries against building table"""
+class TestObjectClassQueries:
+    """Test queries against objectclass table"""
     
-    def test_count_buildings(self, db_connection):
-        """Test counting buildings"""
-        db_connection.execute("SELECT COUNT(*) FROM citydb.building")
+    def test_count_objectclasses(self, db_connection):
+        """Test counting objectclasses"""
+        db_connection.execute("SELECT COUNT(*) FROM citydb.objectclass")
         count = db_connection.fetchone()[0]
-        assert count >= 3  # At least test data
+        assert count >= 4  # Building, BuildingPart, CityFurniture, LandUse
     
-    def test_building_attributes(self, db_connection):
-        """Test building has required attributes"""
+    def test_objectclass_attributes(self, db_connection):
+        """Test objectclass has required attributes"""
         db_connection.execute("""
-            SELECT objectclass_id, class, function 
-            FROM citydb.building 
-            LIMIT 1
+            SELECT id, classname, is_top_level 
+            FROM citydb.objectclass 
+            WHERE classname = 'Building'
         """)
         result = db_connection.fetchone()
         
         assert result is not None
-        assert len(result) == 3
+        assert result[0] == 26  # Building ID
+        assert result[1] == 'Building'
+        assert result[2] is True
     
-    def test_building_with_class_filter(self, db_connection):
-        """Test filtering buildings by class"""
+    def test_top_level_objectclasses(self, db_connection):
+        """Test filtering top-level objectclasses"""
         db_connection.execute("""
-            SELECT COUNT(*) FROM citydb.building 
-            WHERE class = 'Building'
+            SELECT COUNT(*) FROM citydb.objectclass 
+            WHERE is_top_level = TRUE
         """)
         count = db_connection.fetchone()[0]
-        assert count >= 0
+        assert count >= 3
 
 
 @pytest.mark.integration
@@ -217,7 +230,7 @@ class TestDatabasePerformance:
         import time
         
         start = time.time()
-        db_connection.execute("SELECT COUNT(*) FROM citydb.cityobject")
+        db_connection.execute("SELECT COUNT(*) FROM citydb.feature")
         db_connection.fetchone()
         elapsed = time.time() - start
         
@@ -228,7 +241,7 @@ class TestDatabasePerformance:
         """Test that indexes are being used"""
         db_connection.execute("""
             EXPLAIN ANALYZE 
-            SELECT * FROM citydb.cityobject 
+            SELECT * FROM citydb.feature 
             WHERE class = 'Building'
         """)
         result = db_connection.fetchone()
