@@ -4,6 +4,10 @@ env
 sources
 site
 __pycache__
+.pytest_cache
+.coverage
+coverage_report
+htmlcov
 # Ignore Files
 *.*~
 shared/*
@@ -11,6 +15,12 @@ shared/**/*
 tiler_app/*
 citydb-3dtiler.sublime-project
 citydb-3dtiler.sublime-workspace
+*.pyc
+*.pyo
+*.egg-info
+.eggs
+dist
+build
 # Do NOT Ignore Folders
 # Do NOT Ignore Files
 !tiler_app/about_tiler_app.md
@@ -18,5 +28,10 @@ citydb-3dtiler.sublime-workspace
 !shared/.gitkeep
 !.github/workflows/build-docker-image.yml
 !.github/workflows/release.yml
+!.github/workflows/test-postgres-versions.yml
+!tests/
+!pytest.ini
+!run_tests.sh
+!docker-compose.test.yml
 
 
