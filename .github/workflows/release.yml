@@ -11,6 +11,11 @@ env:
 jobs:
   build-and-push-images:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        context: ['citydb-3dtiler']
+      fail-fast: true
+      max-parallel: 1
     permissions:
       contents: read
       packages: write
