@@ -25,7 +25,7 @@ def selected_attributes_to_list(selected_attributes):
     return attributes_list
 
 def create_tileset(args, output_path=None, max_features_per_tile=None, whrs=None, attribute_list = None):
-    print("-o-o-o-o-o>>", attribute_list)
+    # print("-o-o-o-o-o>>", attribute_list)
     # Drop the materials table if it is existing in DB
     drop_cascade_if_exists(args, "_materials_for_features")
     # Create the materials table on DB
@@ -98,7 +98,7 @@ def create_tileset(args, output_path=None, max_features_per_tile=None, whrs=None
 
     # Set the attributes in the following parts considering the relevant arguments.
     if args.attributes == 'none':
-        print("Info: None of the attributes selected.")
+        print("(info): None of the attributes selected.")
         query = QueryBlocks(krnl_query, selected_styling_addition)
         attribute_as_string = None
     elif args.attributes == 'selected':
@@ -147,7 +147,7 @@ def create_tileset(args, output_path=None, max_features_per_tile=None, whrs=None
         # Remove the redundant values (such as core_name) from the list:
         attr_list = list(set(attribute_list))
         # Remove the None values from the list
-        attribute_list = list(filter(lambda x: x is not None, attr_list))
+        attr_list = list(filter(lambda x: x is not None, attr_list))
         print("oooo>>>>", attr_list)
         if len(attr_list) > 0:
             for attr in attr_list:
@@ -173,7 +173,7 @@ def create_tileset(args, output_path=None, max_features_per_tile=None, whrs=None
                 )
             # print(krnl_query.where_elements)
             query = QueryBlocks(krnl_query, selected_styling_addition, selected_attribute_addition)
-            attribute_as_string = ",".join(attribute_list)
+            attribute_as_string = ",".join(attr_list)
             attribute_as_string = attribute_as_string.lower()
         else:
             query = QueryBlocks(krnl_query, selected_styling_addition)
@@ -185,7 +185,7 @@ def create_tileset(args, output_path=None, max_features_per_tile=None, whrs=None
     mfpt = max_features_per_tile
 
     #Test
-    print("--->", len(query))
+    print("--->", query)
     
     crt_mv = create_materialized_view(mv_name, str(query))
     ind_mv = index_materialized_view(mv_name, 'geom')
