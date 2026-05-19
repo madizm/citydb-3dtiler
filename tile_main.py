@@ -96,6 +96,11 @@ def create_tileset(args, output_path=None, max_features_per_tile=None, whrs=None
             properties_riseup_addition.where_elements = whrs
         selected_styling_addition = properties_riseup_addition
 
+    if args.vertical_offset != "0.0":
+        offs = float(args.vertical_offset)
+        # The first element in the SelectElements is geometry col. in kernel query.
+        krnl_query.select_elements[0].field = f"st_translate(gmdt.geometry, 0, 0, {offs})"
+
     # Set the attributes in the following parts considering the relevant arguments.
     if args.attributes == 'none':
         print("(info): None of the attributes selected.")
@@ -240,7 +245,7 @@ def create_tileset(args, output_path=None, max_features_per_tile=None, whrs=None
     generate_tiles(args, mv_name, 'geom', 'material_data', output_path, mfpt, attribute_as_string)
 
 def summarize_advice(args):
-    advices = read_yaml(get_shared_folder_path(), "advise.yml")
+    advices = read_yaml(get_shared_folder_path(), "advice.yml")
     objectclasses = advices["objectclasses"]
     mx_ftr_pr_tl = advices["max_features"]
     oc_attrs = []
@@ -254,7 +259,7 @@ def tile(args):
     # print(args.separate_tilesets)
     if args.separate_tilesets is not None:
         if args.separate_tilesets == "objectclass":
-            # advises = read_yaml(get_shared_folder_path(), "advise.yml")
+            # advises = read_yaml(get_shared_folder_path(), "advice.yml")
             # objectclasses = advises["objectclasses"]
             advice_summary = summarize_advice(args)
             objectclasses = advice_summary["objectclasses"]
