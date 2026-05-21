@@ -235,7 +235,7 @@ def create_tileset(args, output_path=None, max_features_per_tile=None, whrs=None
     mfpt = max_features_per_tile
 
     #Test
-    print("--->", query)
+    # print("--->", query)
     
     crt_mv = create_materialized_view(mv_name, str(query))
     ind_mv = index_materialized_view(mv_name, 'geom')
